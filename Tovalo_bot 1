@@ -1,0 +1,23 @@
+//@version=4
+strategy(title="My Strategy", shorttitle="Strategy", overlay=true)
+// Input parameters
+rsiLength = input(title="RSI Length", type=input.integer, defval=14)
+rsiOversold = input(title="RSI Oversold", type=input.integer, defval=30)
+rsiOverbought = input(title="RSI Overbought", type=input.integer, defval=70)
+rangeFilter = input(title="Range Filter", type=input.float, defval=0.05)
+ema200 = ema(close, 200)
+// Trading conditions
+rsiValue = rsi(close, rsiLength)
+rangeLow = low * (1 - rangeFilter)
+rangeHigh = high * (1 + rangeFilter)
+buySignal = crossover(rsiValue, rsiOversold) and close > ema200 and low > rangeLow
+sellSignal = crossunder(rsiValue, rsiOverbought) and close < ema200 and high < rangeHigh
+// Entry and exit points
+if buySignal
+    strategy.entry("Buy", strategy.long)
+    
+if sellSignal
+    strategy.entry("Sell", strategy.short)
+    
+strategy.exit("Exit", "Buy", profit=10000, loss=5000)
+strategy.exit("Exit", "Sell", profit=10000, loss=5000)
